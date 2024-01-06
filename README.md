@@ -37,7 +37,7 @@ jobs:
 
       - name: Semantic Calendar Version
         id: version
-        uses: lukashornych/semantic-calendar-version@1.0.0
+        uses: lukashornych/semantic-calendar-version@1.0.3
 
       - name: Use the version
         run: |
@@ -100,7 +100,7 @@ jobs:
           fetch-depth: 0                # fetch the whole repo history
 
       - name: Semantic Calendar Version
-        uses: lukashornych/semantic-calendar-version@1.0.0
+        uses: lukashornych/semantic-calendar-version@1.0.3
         with:
           prefix: module1-
           log-path: module1/
@@ -133,7 +133,7 @@ jobs:
           fetch-depth: 0                # fetch the whole repo history
 
       - name: Semantic Calendar Version
-        uses: lukashornych/semantic-calendar-version@1.0.0
+        uses: lukashornych/semantic-calendar-version@1.0.3
         with:
           prefix: module2-
           log-path: module2/
