@@ -73,6 +73,42 @@ describe SemanticCalendarVersion do
     end
   end
 
+  it "should properly bump the version using regex" do
+    tmp = InTmp.new
+    current_year = Time.local.year
+
+    begin
+      tmp.exec %(git init)
+      tmp.exec %(git checkout -b master)
+      tmp.exec %(git commit --no-gpg-sign --allow-empty -m "1")
+      tmp.exec %(git tag "#{current_year}.1.0")
+
+      git = SemanticCalendarVersion::Git.new("dev", "master", "/feat(?:\\([^)]+\\))?:/", tmp.@tmpdir)
+
+      tmp.exec %(git commit --no-gpg-sign --allow-empty -m "feat: 2")
+
+      hash = git.current_commit_hash
+      version = git.get_new_version
+      version.should eq("#{current_year}.2.0")
+
+      tmp.exec %(git tag "#{current_year}.2.0")
+      tmp.exec %(git commit --no-gpg-sign --allow-empty -m "feat(#10): 3")
+
+      hash = git.current_commit_hash
+      version = git.get_new_version
+      version.should eq("#{current_year}.3.0")
+
+      tmp.exec %(git tag "#{current_year}.3.0")
+      tmp.exec %(git commit --no-gpg-sign --allow-empty -m "feat(api): 4")
+
+      hash = git.current_commit_hash
+      version = git.get_new_version
+      version.should eq("#{current_year}.4.0")
+    ensure
+      tmp.cleanup
+    end
+  end
+
   it "should properly bump the version" do
     tmp = InTmp.new
     current_year = Time.local.year
