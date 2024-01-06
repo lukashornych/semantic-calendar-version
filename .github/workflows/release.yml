@@ -49,6 +49,9 @@ jobs:
       - name: Setup Crystal
         uses: crystal-lang/install-crystal@v1
 
+      - name: Setup Git for tests
+        uses: actions4git/setup-git@v1
+
       - name: Run tests
         run: crystal spec spec/*.cr
 
