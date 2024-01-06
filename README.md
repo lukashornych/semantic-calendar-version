@@ -191,14 +191,14 @@ _Example3 (with feature message):_
 
 You can configure the action with various inputs, a list of which has been provided below:
 
-| Name             | Description                                                                                     | Default Value        |
-|------------------|-------------------------------------------------------------------------------------------------|----------------------|
-| tool-version     | The version of the tool to run                                                                  | latest               |
-| release-branch   | The name of the master/main branch                                                              | master               |
-| dev-branch       | The name of the development branch                                                              | dev                  |
-| minor-identifier | The string used to identify a minor release (wrap with '/' to match using a regular expression) | /feat(\([^\)]+\))?:/ |
-| prefix           | The prefix used for the version name                                                            |                      |
-| log-paths        | The paths used to calculate changes (comma-separated)                                           |                      |
+| Name             | Description                                                                                     | Default Value |
+|------------------|-------------------------------------------------------------------------------------------------|---------------|
+| tool-version     | The version of the tool to run                                                                  | latest        |
+| release-branch   | The name of the master/main branch                                                              | master        |
+| dev-branch       | The name of the development branch                                                              | dev           |
+| minor-identifier | The string used to identify a minor release (wrap with '/' to match using a regular expression) | feature:      |
+| prefix           | The prefix used for the version name                                                            |               |
+| log-paths        | The paths used to calculate changes (comma-separated)                                           |               |
 
 ## Requirements
 
