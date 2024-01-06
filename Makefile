@@ -18,6 +18,11 @@ build: ## compiles from crystal sources
 	mkdir -p bin
 	$(CRYSTAL) build $(CRYSTAL_FLAGS) src/main.cr -o bin/semantic-calendar-version
 
+.PHONY: buildStatic
+buildStatic: ## compiles from crystal sources into static binary
+	mkdir -p bin
+	$(CRYSTAL) build $(CRYSTAL_FLAGS) $(CRYSTAL_STATIC_FLAGS) src/main.cr -o bin/semantic-calendar-version
+
 .PHONY: clean
 clean: ## clean target directories
 	rm -rf bin

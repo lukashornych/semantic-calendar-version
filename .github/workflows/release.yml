@@ -56,7 +56,7 @@ jobs:
         run: crystal spec spec/*.cr
 
       - name: Build
-        run: mkdir bin && crystal build --release src/main.cr -o bin/semantic-calendar-version
+        run: mkdir bin && crystal build --release --static src/main.cr -o bin/semantic-calendar-version
 
       - name: Create release
         id: create_release
