@@ -1,6 +1,6 @@
-name: Git Version
-author: "Codacy"
-description: 'Semver versioning based on the git history and commit messages of your repository.'
+name: Semantic Calendar Version
+author: "lukashornych"
+description: 'Semantic calendar versioning based on the git history and commit messages of your repository.'
 branding:
   icon: 'git-branch'
   color: 'gray-dark'
@@ -21,10 +21,6 @@ inputs:
     description: 'The string or regex to identify a minor release commit'
     required: true
     default: 'feature:'
-  major-identifier:
-    description: 'The string or regex to identify a major release commit'
-    required: true
-    default: 'breaking:'
   prefix:
     description: 'The prefix to use in the version'
     required: false
@@ -46,23 +42,22 @@ runs:
       run: |
         set -eo pipefail
         if [ "${{ inputs.tool-version }}" = "latest" ]; then
-          download_url="$(curl -Ls https://api.github.com/repos/codacy/git-version/releases/latest | jq -r .assets[0].browser_download_url)"
+          download_url="$(curl -Ls https://api.github.com/repos/lukashornych/semantic-calendar-version/releases/latest | jq -r .assets[0].browser_download_url)"
         else
-          download_url="https://github.com/codacy/git-version/releases/download/${{ inputs.tool-version }}/git-version"
+          download_url="https://github.com/lukashornych/semantic-calendar-version/releases/download/${{ inputs.tool-version }}/semantic-calendar-version"
         fi
-        curl -Ls "$download_url" > /usr/local/bin/git-version
-        chmod +x /usr/local/bin/git-version
+        curl -Ls "$download_url" > /usr/local/bin/semantic-calendar-version
+        chmod +x /usr/local/bin/semantic-calendar-version
     - id: previous-version
       shell: bash
       run: |
         set -eo pipefail
 
-        export PREVIOUS_VERSION=$(git-version \
+        export PREVIOUS_VERSION=$(semantic-calendar-version \
             --previous-version \
             --release-branch "${{ inputs.release-branch }}" \
             --dev-branch "${{ inputs.dev-branch }}" \
             --minor-identifier="${{ inputs.minor-identifier }}" \
-            --major-identifier="${{ inputs.major-identifier }}" \
             --version-prefix "${{ inputs.prefix }}")
 
         echo "previous-version=$PREVIOUS_VERSION" >> $GITHUB_OUTPUT
@@ -72,11 +67,10 @@ runs:
       run: |
         set -eo pipefail
 
-        export VERSION=$(git-version \
+        export VERSION=$(semantic-calendar-version \
             --release-branch "${{ inputs.release-branch }}" \
             --dev-branch "${{ inputs.dev-branch }}" \
             --minor-identifier="${{ inputs.minor-identifier }}" \
-            --major-identifier="${{ inputs.major-identifier }}" \
             --version-prefix "${{ inputs.prefix }}")
 
         echo "version=$VERSION" >> $GITHUB_OUTPUT

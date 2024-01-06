@@ -1,0 +1,70 @@
+# Builds and releases a new public version and puts it into `Releases` section of GitHub
+
+name: Release
+
+on:
+  push:
+    branches:
+      - 'master'
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build-and-release:
+    name: Build and release
+    permissions:
+      # write permission is required to create a github release
+      contents: write
+
+      # write permission is required for autolabeler
+      # otherwise, read permission is required at least
+      pull-requests: write
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
+      released_version: ${{ steps.release_version.outputs.version }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Resolve new release version
+        id: release_version
+        uses: codacy/git-version@2.7.1
+        with:
+          prefix: 'v'
+          minor-identifier: '/feat(\([^\)]+\))?:/'
+          major-identifier: '(breaking)' # this should be placed somewhere in the commit message like "feat: (breaking) some message"
+
+      - name: Setup Crystal
+        uses: crystal-lang/install-crystal@v1
+
+      - name: Run tests
+        run: crystal spec spec/*.cr
+
+      - name: Build
+        run: crystal build --release src/main.cr -o bin/semantic-calendar-version
+
+      - name: Create release
+        id: create_release
+        uses: release-drafter/release-drafter@v5
+        with:
+          version: ${{ steps.release_version.outputs.version }}
+          publish: true
+
+      - name: Upload build to release
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./bin/semantic-calendar-version
+          asset_name: semantic-calendar-version

@@ -2,7 +2,7 @@ require "file_utils"
 
 require "semantic_version"
 
-module GitVersion
+module SemanticCalendarVersion
   extend self
 
   BASE_VERSION_STRING = "0.0.0"
@@ -11,14 +11,9 @@ module GitVersion
   DEV_BRANCH_SUFFIX = "SNAPSHOT"
 
   class Git
-    def initialize(@dev_branch : String, @release_branch : String, @minor_identifier : String, @major_identifier : String,
+    def initialize(@dev_branch : String, @release_branch : String, @minor_identifier : String,
                    @folder = FileUtils.pwd, @prefix : String = "", @log_paths : String = "")
-      @major_id_is_regex = false
       @minor_id_is_regex = false
-      if match = /\/(.*)\//.match(@major_identifier)
-        @major_identifier = match[1]
-        @major_id_is_regex = true
-      end
       if match = /\/(.*)\//.match(@minor_identifier)
         @minor_identifier = match[1]
         @minor_id_is_regex = true
@@ -98,7 +93,7 @@ module GitVersion
       return [] of String
     end
 
-    def get_previous_tag_and_version: Tuple(String | Nil, SemanticVersion)
+    def get_previous_tag_and_version : Tuple(String | Nil, SemanticVersion)
       cb = current_branch_or_tag
 
       branch_tags = tags_by_branch(cb)
@@ -126,7 +121,7 @@ module GitVersion
       return {previous_tag, previous_version}
     end
 
-    def get_previous_version: String
+    def get_previous_version : String
       lt, lv = get_previous_tag_and_version
       return lt ? lt : add_prefix(lv.to_s)
     end
@@ -134,35 +129,20 @@ module GitVersion
     def get_new_version
       previous_tag, previous_version = get_previous_tag_and_version
 
-      previous_version =
-        SemanticVersion.new(
-          previous_version.major,
-          previous_version.minor,
-          previous_version.patch + 1,
-          nil,
-          nil,
-        )
+      new_version = nil
 
       major = false
-      get_commits_since(previous_tag).each do |c|
-        commit = c.downcase
-        match = if @major_id_is_regex
-          /#{@major_identifier}/.match(commit)
-        else
-          commit.includes?(@major_identifier)
-        end
-        if match
-          previous_version =
-            SemanticVersion.new(
-              previous_version.major + 1,
-              0,
-              0,
-              previous_version.prerelease,
-              previous_version.build,
-            )
-          major = true
-          break
-        end
+      current_year = Time.local.year
+      if previous_version.major < current_year
+        new_version =
+          SemanticVersion.new(
+            current_year,
+            1,
+            0,
+            previous_version.prerelease,
+            previous_version.build,
+          )
+        major = true
       end
 
       if !major
@@ -174,7 +154,7 @@ module GitVersion
             commit.includes?(@minor_identifier)
           end
           if match
-            previous_version =
+            new_version =
               SemanticVersion.new(
                 previous_version.major,
                 previous_version.minor + 1,
@@ -187,34 +167,44 @@ module GitVersion
         end
       end
 
+      if new_version.nil?
+        new_version = SemanticVersion.new(
+          previous_version.major,
+          previous_version.minor,
+          previous_version.patch + 1,
+          nil,
+          nil,
+        )
+      end
+
       cb = current_branch_or_tag
 
       if cb == @release_branch
         #
       elsif cb == @dev_branch
         prerelease = [DEV_BRANCH_SUFFIX, commits_distance(previous_tag), current_commit_hash()] of String | Int32
-        previous_version =
+        new_version =
           SemanticVersion.new(
-            previous_version.major,
-            previous_version.minor,
-            previous_version.patch,
+            new_version.major,
+            new_version.minor,
+            new_version.patch,
             SemanticVersion::Prerelease.new(prerelease),
             nil
           )
       else
-        branch_sanitized_name = cb.downcase.gsub(/[^a-zA-Z0-9]/, "")[0,30]
+        branch_sanitized_name = cb.downcase.gsub(/[^a-zA-Z0-9]/, "")[0, 30]
         prerelease = [branch_sanitized_name, commits_distance(previous_tag), current_commit_hash()] of String | Int32
-        previous_version =
+        new_version =
           SemanticVersion.new(
-            previous_version.major,
-            previous_version.minor,
-            previous_version.patch,
+            new_version.major,
+            new_version.minor,
+            new_version.patch,
             SemanticVersion::Prerelease.new(prerelease),
             nil
           )
       end
 
-      return add_prefix(previous_version.to_s)
+      return add_prefix(new_version.to_s)
     end
   end
 end
