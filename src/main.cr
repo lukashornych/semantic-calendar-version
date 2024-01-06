@@ -7,7 +7,7 @@ require "./semantic-calendar-version"
 previous_version = false
 dev_branch = "dev"
 release_branch = "master"
-minor_identifier = "/feat(?:\\([^)]+\\))?:/" # based on https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines
+minor_identifier = "feature:"
 prefix = ""
 log_paths = ""
 
