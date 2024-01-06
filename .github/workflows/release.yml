@@ -71,3 +71,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./bin/semantic-calendar-version
           asset_name: semantic-calendar-version
+          asset_content_type: application/octet-stream
