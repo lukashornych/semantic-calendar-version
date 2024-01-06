@@ -56,7 +56,7 @@ jobs:
         run: crystal spec spec/*.cr
 
       - name: Build
-        run: crystal build --release src/main.cr -o bin/semantic-calendar-version
+        run: crystal build --release src/main.cr -o ./dist/semantic-calendar-version
 
       - name: Create release
         id: create_release
@@ -69,5 +69,5 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./bin/semantic-calendar-version
+          asset_path: ./dist/semantic-calendar-version
           asset_name: semantic-calendar-version
