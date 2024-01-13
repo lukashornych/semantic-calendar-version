@@ -65,6 +65,7 @@ runs:
             --previous-version \
             --release-branch "${{ inputs.release-branch }}" \
             --dev-branch "${{ inputs.dev-branch }}" \
+            --year_switch_mode "${{ inputs.year_switch_mode }}" \
             --minor-identifier="${{ inputs.minor-identifier }}" \
             --version-prefix "${{ inputs.prefix }}")
 
@@ -78,6 +79,7 @@ runs:
         export VERSION=$(semantic-calendar-version \
             --release-branch "${{ inputs.release-branch }}" \
             --dev-branch "${{ inputs.dev-branch }}" \
+            --year_switch_mode "${{ inputs.year_switch_mode }}" \
             --minor-identifier="${{ inputs.minor-identifier }}" \
             --version-prefix "${{ inputs.prefix }}")
 
