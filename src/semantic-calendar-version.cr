@@ -10,8 +10,15 @@ module SemanticCalendarVersion
 
   DEV_BRANCH_SUFFIX = "SNAPSHOT"
 
+  enum YearSwitchMode
+    # Switch to new year version when the current year changes for all changes
+    Always
+    # Switch to new year version when the current year changes but only for minor changes, not for patch changes
+    OnMinor
+  end
+
   class Git
-    def initialize(@dev_branch : String, @release_branch : String, @minor_identifier : String,
+    def initialize(@dev_branch : String, @release_branch : String, @year_switch_mode : YearSwitchMode, @minor_identifier : String,
                    @folder = FileUtils.pwd, @prefix : String = "", @log_paths : String = "")
       @minor_id_is_regex = false
       if match = /\/(.*)\//.match(@minor_identifier)
@@ -133,7 +140,7 @@ module SemanticCalendarVersion
 
       major = false
       current_year = Time.local.year
-      if previous_version.major < current_year
+      if @year_switch_mode == YearSwitchMode::Always && previous_version.major < current_year
         new_version =
           SemanticVersion.new(
             current_year,
@@ -154,14 +161,25 @@ module SemanticCalendarVersion
             commit.includes?(@minor_identifier)
           end
           if match
-            new_version =
-              SemanticVersion.new(
-                previous_version.major,
-                previous_version.minor + 1,
-                0,
-                previous_version.prerelease,
-                previous_version.build,
-              )
+            if @year_switch_mode == YearSwitchMode::OnMinor && previous_version.major < current_year
+              new_version =
+                SemanticVersion.new(
+                  current_year,
+                  1,
+                  0,
+                  previous_version.prerelease,
+                  previous_version.build,
+                )
+            else
+              new_version =
+                SemanticVersion.new(
+                  previous_version.major,
+                  previous_version.minor + 1,
+                  0,
+                  previous_version.prerelease,
+                  previous_version.build,
+                )
+            end
             break
           end
         end

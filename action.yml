@@ -17,6 +17,14 @@ inputs:
     description: 'The name of the dev branch'
     required: true
     default: dev
+  year_switch_mode:
+    description: |
+      Specifies when to switch to a new year. 
+      Possible values: 
+        - Always - switches to a new year for all changes
+        - OnMinor - switches to a new year only for minor changes, not for patch changes
+    required: false
+    default: 'Always'
   minor-identifier:
     description: 'The string or regex to identify a minor release commit'
     required: true
