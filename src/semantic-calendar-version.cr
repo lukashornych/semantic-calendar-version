@@ -18,7 +18,7 @@ module SemanticCalendarVersion
   end
 
   class Git
-    def initialize(@dev_branch : String, @release_branch : String, @year_switch_mode : YearSwitchMode, @minor_identifier : String,
+    def initialize(@dev_branch : String, @release_branch : String, @hotfix_branch : String, @year_switch_mode : YearSwitchMode, @minor_identifier : String,
                    @folder = FileUtils.pwd, @prefix : String = "", @log_paths : String = "")
       @minor_id_is_regex = false
       if match = /\/(.*)\//.match(@minor_identifier)
@@ -197,7 +197,7 @@ module SemanticCalendarVersion
 
       cb = current_branch_or_tag
 
-      if cb == @release_branch
+    if cb == @release_branch || /#{@hotfix_branch}/.match(cb)
         #
       elsif cb == @dev_branch
         prerelease = [DEV_BRANCH_SUFFIX, commits_distance(previous_tag), current_commit_hash()] of String | Int32

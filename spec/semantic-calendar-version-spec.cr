@@ -10,7 +10,7 @@ describe SemanticCalendarVersion do
     tmp = InTmp.new
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
       current_year = Time.local.year
 
       tmp.exec %(git init)
@@ -61,7 +61,7 @@ describe SemanticCalendarVersion do
       tmp.exec %(git checkout -b my-fancy.branch)
       tmp.exec %(git commit --no-gpg-sign --allow-empty -m "2")
 
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       hash = git.current_commit_hash
 
@@ -73,6 +73,31 @@ describe SemanticCalendarVersion do
     end
   end
 
+  it "should get the correct version hotfix branch" do
+      tmp = InTmp.new
+      current_year = Time.local.year
+
+      begin
+        tmp.exec %(git init)
+        tmp.exec %(git checkout -b master)
+        tmp.exec %(git commit --no-gpg-sign --allow-empty -m "1")
+        tmp.exec %(git tag "#{current_year}.1.0")
+
+        tmp.exec %(git checkout -b release_2025_1_0)
+        tmp.exec %(git commit --no-gpg-sign --allow-empty -m "2")
+
+        git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+
+        hash = git.current_commit_hash
+
+        version = git.get_new_version
+
+        version.should eq("#{current_year}.1.1")
+      ensure
+        tmp.cleanup
+      end
+    end
+
   it "should properly bump the version using regex" do
     tmp = InTmp.new
     current_year = Time.local.year
@@ -83,7 +108,7 @@ describe SemanticCalendarVersion do
       tmp.exec %(git commit --no-gpg-sign --allow-empty -m "1")
       tmp.exec %(git tag "#{current_year}.1.0")
 
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "/feat(?:\\([^)]+\\))?:/", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "/feat(?:\\([^)]+\\))?:/", tmp.@tmpdir)
 
       tmp.exec %(git commit --no-gpg-sign --allow-empty -m "feat: 2")
 
@@ -121,7 +146,7 @@ describe SemanticCalendarVersion do
 
       tmp.exec %(git checkout -b dev)
 
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git commit --no-gpg-sign --allow-empty -m "XYZ in new year")
 
@@ -156,7 +181,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -205,7 +230,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -235,7 +260,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -254,7 +279,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -279,7 +304,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -330,7 +355,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -361,7 +386,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -394,7 +419,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -423,7 +448,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -443,7 +468,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::OnMinor, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::OnMinor, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -463,7 +488,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::OnMinor, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::OnMinor, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -491,7 +516,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -511,7 +536,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -529,7 +554,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -550,7 +575,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -570,7 +595,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -589,7 +614,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -608,7 +633,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -630,7 +655,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir2/")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir2/")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -660,7 +685,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir1/ dir3/")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir1/ dir3/")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -700,7 +725,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir2/ dir3/")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir2/ dir3/")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -739,7 +764,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir1/")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "", "dir1/")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -764,7 +789,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "dir2-", "dir2/ dir3/")
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "dir2-", "dir2/ dir3/")
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b master)
@@ -804,7 +829,7 @@ describe SemanticCalendarVersion do
     current_year = Time.local.year
 
     begin
-      git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+      git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
       tmp.exec %(git init)
       tmp.exec %(git checkout -b very-very-very-very-long-branch-name-that-excedes-k8s-limits)
@@ -824,7 +849,7 @@ it "get previous version - first commit" do
   tmp = InTmp.new
 
   begin
-    git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
+    git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir)
 
     tmp.exec %(git init)
     tmp.exec %(git checkout -b master)
@@ -842,7 +867,7 @@ it "get previous version - first commit w/ prefix" do
   tmp = InTmp.new
 
   begin
-    git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
+    git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
 
     tmp.exec %(git init)
     tmp.exec %(git checkout -b master)
@@ -860,7 +885,7 @@ it "get previous version - pre-tagged" do
   tmp = InTmp.new
 
   begin
-    git = SemanticCalendarVersion::Git.new("dev", "master", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
+    git = SemanticCalendarVersion::Git.new("dev", "master", "release_.*", SemanticCalendarVersion::YearSwitchMode::Always, "feat:", tmp.@tmpdir, "v")
 
     tmp.exec %(git init)
     tmp.exec %(git checkout -b master)
