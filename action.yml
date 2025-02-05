@@ -6,7 +6,7 @@ branding:
   color: 'gray-dark'
 inputs:
   tool-version:
-    description: 'The version of the tool to be ran'
+    description: 'The version of the tool to be run'
     required: true
     default: latest
   release-branch:
@@ -17,6 +17,10 @@ inputs:
     description: 'The name of the dev branch'
     required: true
     default: dev
+  hotfix-branch-pattern:
+    description: 'The regex pattern for hotfix branches'
+    required: true
+    default: 'release_.*'
   year_switch_mode:
     description: |
       Specifies when to switch to a new year. 
@@ -65,6 +69,7 @@ runs:
             --previous-version \
             --release-branch "${{ inputs.release-branch }}" \
             --dev-branch "${{ inputs.dev-branch }}" \
+            --hotfix-branch-pattern "${{ inputs.hotfix-branch-pattern }}" \
             --year-switch-mode "${{ inputs.year_switch_mode }}" \
             --minor-identifier="${{ inputs.minor-identifier }}" \
             --version-prefix "${{ inputs.prefix }}")
@@ -79,6 +84,7 @@ runs:
         export VERSION=$(semantic-calendar-version \
             --release-branch "${{ inputs.release-branch }}" \
             --dev-branch "${{ inputs.dev-branch }}" \
+            --hotfix-branch-pattern "${{ inputs.hotfix-branch-pattern }}" \
             --year-switch-mode "${{ inputs.year_switch_mode }}" \
             --minor-identifier="${{ inputs.minor-identifier }}" \
             --version-prefix "${{ inputs.prefix }}")
